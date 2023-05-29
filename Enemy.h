@@ -19,7 +19,7 @@ public:
 	///
 	///
 	///
-	void Initialize(Model* model, const Vector3& position);
+	void Initialize(Model* model, const Vector3& position, const Vector3& velocity);
 
 	///
 	///
@@ -39,7 +39,7 @@ public:
 	Model* model_ = nullptr;
 	uint32_t textureHandle_;
 	float enemyInputFloat[3]{0, 0, 0};
-	//Phase phase_ = Phase::Approach();
-	
+	Phase phase_ = Phase ::Approach;
+	Vector3 velocity_;
 	
 };
