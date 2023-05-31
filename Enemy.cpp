@@ -21,40 +21,39 @@ void Enemy::Initialize(Model* model, const Vector3& position,const Vector3& velo
 ///
 ///
 void Enemy::Update() {
+
+	//const float kCharacterSpeed = 0.2f;
+
+	(this->*spFuncTable[static_cast<size_t>(phase_)])();
 	worldTransform_.UpdateMatrix();
 	
-	const float kCharacterSpeed = 0.2f;
 	
-	switch (phase_) {
-	case Phase::Approach:
-	
-		
-		//移動（ベクトルを加算）
-		worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
-		worldTransform_.translation_.z -= kCharacterSpeed;
 
-		//規定の位置に到達したら離脱
-		if (worldTransform_.translation_.z < 0.0f) {
-			phase_ = Phase::Leave;
-		}
-		break;
-	case Phase::Leave:
-		
-		//移動（ベクトルを加算）
-		worldTransform_.translation_ = Add(worldTransform_.translation_, {-0.5f, 0.5f, 0.0f});
-		
-		break;
-	default:
-		break;
+	//// 移動（ベクトルを加算）
+	//worldTransform_.translation_ = Add(worldTransform_.translation_, {-0.5f, 0.5f, 0.0f});
+}
+	
+void Enemy::Approach() {
+	// 移動（ベクトルを加算）
+	worldTransform_.translation_ = Add(worldTransform_.translation_, {0.0f, 0.0f, -0.5f});
+
+	// 規定の位置に到達したら離脱
+	if (worldTransform_.translation_.z < 0.0f) {
+		phase_ = Phase::Leave;
 	}
+}
 	
+void Enemy::Leave() {
+	// 移動（ベクトルを加算）
+	worldTransform_.translation_ = Add(worldTransform_.translation_, {-0.5f, 0.5f, 0.0f});
+}
 
-	
-};
-//void Enemy::Approach
-    ///
-///
-///
 void Enemy::Draw(const ViewProjection view){ 
 	model_->Draw(worldTransform_, view, textureHandle_); 
 };
+
+void (Enemy::*Enemy::spFuncTable[])() = {
+	&Enemy::Approach,
+	&Enemy::Leave
+};
+
