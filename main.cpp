@@ -6,6 +6,9 @@
 #include "PrimitiveDrawer.h"
 #include "TextureManager.h"
 #include "WinApp.h"
+#include "Engine.h"
+#include <iostream>
+#include <cstdlib>
 
 
 
@@ -65,6 +68,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
 	gameScene->Initialize();
+	
+	Engine engine;
 
 	// メインループ
 	while (true) {
@@ -96,6 +101,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		imguiManager->Draw();
 		// 描画終了
 		dxCommon->PostDraw();
+		//状態を切り替える
+		int no;
+		std::cout << "0:down 1up 2:state表示 9:終了===>";
+		std::cin >> no;
+
+		if (no == 0)engine.down();
+		if (no == 1)engine.up();
+		if (no == 2)engine.showNowState();
+		if (no == 9)break;
 	}
 
 	// 各種解放
@@ -107,5 +121,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// ゲームウィンドウの破棄
 	win->TerminateGameWindow();
 
+	system("pause");
 	return 0;
 }
