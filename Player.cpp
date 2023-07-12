@@ -8,7 +8,7 @@ Player::~Player() {
 		delete bullet;
 	}
 }
-
+ 
 
 void Player::Atack() {
 if (input_->PushKey(DIK_SPACE)) {
