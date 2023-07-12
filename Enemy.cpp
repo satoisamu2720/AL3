@@ -40,12 +40,21 @@ void Enemy::Update() {
 		//移動（ベクトルを加算）
 		worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
 		//worldTransform_.translation_.z -= kCharacterSpeed;
+	    startTimer--;
+	if (startTimer <= 5) {
 
 		Fire();
-	    for (EnemyBullet* bullet : bullets_) {
-			bullet->Updarte();
-		}
+		Approach();
+		
+		startTimer = kFreInterval;
+	 }
+	for (EnemyBullet* bullet : bullets_) {
+		bullet->Updarte();
+	}
 };
+void Enemy::Approach() { 
+	startTimer = 0; 
+}
 
 void Enemy::Draw(const ViewProjection viewProjection) { 
 	model_->Draw(worldTransform_, viewProjection, textureHandle_); 

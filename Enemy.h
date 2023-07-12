@@ -35,6 +35,11 @@ public:
 	///
 	void Fire();
 
+	///
+	///
+	///
+	void Approach();
+
 	/// <summary>
 	/// 行動フェーズ
 	/// </summary>
@@ -44,6 +49,8 @@ public:
 		Leave,    // 離脱する
 	};
 	~Enemy();
+
+public:
 	WorldTransform worldTransform_;
 	Model* model_ = nullptr;
 	uint32_t textureHandle_;
@@ -52,5 +59,8 @@ public:
 	Vector3 velocity_;
 	EnemyBullet* bullet_ = nullptr;
 	std::list<EnemyBullet*> bullets_;
-	
+	static const int kFreInterval = 60;
+
+private:
+	int32_t startTimer = 0;
 };
