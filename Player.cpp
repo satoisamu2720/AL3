@@ -20,10 +20,10 @@ if (input_->PushKey(DIK_SPACE)) {
 	const float kBulletSpeed = 1.0f;
 	Vector3 velcity(0, 0, kBulletSpeed);
 	velcity = TransformNormal(velcity, worldTransform_.matWorld_);
-		PlayerBullet* newBulllet = new PlayerBullet();
-		newBulllet->Initialize(model_, worldTransform_.translation_,velcity);
+		PlayerBullet* newBullet = new PlayerBullet();
+		newBullet->Initialize(model_, worldTransform_.translation_,velcity);
 		// 弾を登録する
-		bullets_. push_back(newBulllet);
+		bullets_. push_back(newBullet);
 	};
 }
 
@@ -108,9 +108,6 @@ void Player::Update() {
 
 	 
 	Atack();
-	if (bullet_) {
-		bullet_->Updarte();
-	}
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Updarte();
 	}

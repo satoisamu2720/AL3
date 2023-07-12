@@ -2,9 +2,12 @@
 #include "Enemy.h"
 #include "VectraCalculation.h"
 
-///
-///
-/// 
+Enemy::~Enemy() {
+	for (EnemyBullet* bullet : bullets_) {
+
+		delete bullet;
+	}
+}
 void Enemy::Initialize(Model* model, const Vector3& position,const Vector3& velocity) {
 	assert(model);
 	model_ = model;
@@ -14,47 +17,39 @@ void Enemy::Initialize(Model* model, const Vector3& position,const Vector3& velo
 	velocity_ = velocity;
 };
 
-	
-	
+void Enemy::Fire() {
+	//弾を生成し，初期化
+	if (bullet_) {
+		delete bullet_;
+		bullet_ = nullptr;
+	}
+		EnemyBullet* newBullet = new EnemyBullet();
+		const float kBulletSpeed = -1.0f;
+		Vector3 velcity(0, 0, kBulletSpeed);
+		velcity = TransformNormal(velcity, worldTransform_.matWorld_);
+		newBullet->Initialize(model_, worldTransform_.translation_, velcity);
 
-///
-///
-///
+		// 弾を登録する
+		bullets_.push_back(newBullet);
+	
+}
+	
 void Enemy::Update() {
 	worldTransform_.UpdateMatrix();
-	
-	const float kCharacterSpeed = 0.2f;
-	
-	switch (phase_) {
-	case Phase::Approach:
-	
-		
+	//const float kCharacterSpeed = 0.2f;
 		//移動（ベクトルを加算）
 		worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
-		worldTransform_.translation_.z -= kCharacterSpeed;
+		//worldTransform_.translation_.z -= kCharacterSpeed;
 
-		//規定の位置に到達したら離脱
-		if (worldTransform_.translation_.z < 0.0f) {
-			phase_ = Phase::Leave;
+		Fire();
+	    for (EnemyBullet* bullet : bullets_) {
+			bullet->Updarte();
 		}
-		break;
-	case Phase::Leave:
-		
-		//移動（ベクトルを加算）
-		worldTransform_.translation_ = Add(worldTransform_.translation_, {-0.5f, 0.5f, 0.0f});
-		
-		break;
-	default:
-		break;
-	}
-	
-
-	
 };
-//void Enemy::Approach
-    ///
-///
-///
-void Enemy::Draw(const ViewProjection view){ 
-	model_->Draw(worldTransform_, view, textureHandle_); 
+
+void Enemy::Draw(const ViewProjection viewProjection) { 
+	model_->Draw(worldTransform_, viewProjection, textureHandle_); 
+ for (EnemyBullet* bullet : bullets_) {
+		bullet->Draw(viewProjection);
+	}
 };

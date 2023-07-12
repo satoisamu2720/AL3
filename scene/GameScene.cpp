@@ -27,7 +27,7 @@ void GameScene::Initialize() {
 	player_->Initialize(model_, textureHandle_);
 
 	enemy_ = new Enemy();
-	Vector3 position = {0, 3, 30};
+	Vector3 position = {8, 3, 30};
 	enemy_->Initialize(model_, position, velocity_);
 
 	debugCamera_ = new DebugCamera(1280, 720);

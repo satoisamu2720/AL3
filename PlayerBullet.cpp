@@ -2,8 +2,6 @@
 #include "PlayerBullet.h"
 #include "VectraCalculation.h"
 
-
-
 void PlayerBullet::Initialize(Model* model, const Vector3& position ,const Vector3& velocity) { 
 	
 	assert(model);
@@ -13,16 +11,16 @@ void PlayerBullet::Initialize(Model* model, const Vector3& position ,const Vecto
 	model_ = model;
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
-
 	velocity_ = velocity;
-	
 };
 
 
-void PlayerBullet::Updarte(){ worldTransform_.UpdateMatrix();
-	    
+void PlayerBullet::Updarte(){ 
+
+worldTransform_.UpdateMatrix();	  
+
 worldTransform_.translation_.x += velocity_.x;
-	worldTransform_.translation_.y += velocity_.y;
+worldTransform_.translation_.y += velocity_.y;
 worldTransform_.translation_.z += velocity_.z;
 };
 
