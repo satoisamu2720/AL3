@@ -36,10 +36,10 @@ void Enemy::Fire() {
 	
 void Enemy::Update() {
 	worldTransform_.UpdateMatrix();
-	//const float kCharacterSpeed = 0.2f;
+	const float kCharacterSpeed = 0.2f;
 		//移動（ベクトルを加算）
 		worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
-		//worldTransform_.translation_.z -= kCharacterSpeed;
+		worldTransform_.translation_.z -= kCharacterSpeed;
 	    startTimer--;
 	if (startTimer <= 5) {
 
