@@ -10,6 +10,7 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "Enemy.h"
 
 /// <summary>
 /// ゲームシーン
@@ -66,7 +67,8 @@ private: // メンバ変数
 
 	DebugCamera* debugCamera_ = nullptr;
 	Player* player_ = nullptr;
-
+	Enemy* enemy_ = nullptr;
+	Vector3 velocity_;
 	bool isDebugcameraActive_ = false;
 	/// <summary>
 	/// ゲームシーン用

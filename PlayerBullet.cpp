@@ -1,6 +1,5 @@
 #pragma once
 #include "PlayerBullet.h"
-#include "assert.h"
 #include "VectraCalculation.h"
 
 

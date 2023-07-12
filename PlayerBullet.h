@@ -1,6 +1,7 @@
 #pragma once
 #include "Model.h"
 #include "WorldTransform.h"
+#include "assert.h"
 class PlayerBullet {
 public:
 	/// <summary>
