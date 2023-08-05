@@ -1,5 +1,5 @@
 #include "EnemyBullet.h"
-
+#include "VectraCalculation.h"
 void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector3& velocity) {
 
 	assert(model);
@@ -13,13 +13,11 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, const Vector
 	velocity_ = velocity;
 };
 
-void EnemyBullet::Updarte() {
+void EnemyBullet::Update() {
 
 	worldTransform_.UpdateMatrix();
 
-	worldTransform_.translation_.x += velocity_.x;
-	worldTransform_.translation_.y += velocity_.y;
-	worldTransform_.translation_.z += velocity_.z;
+	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
 	
 	if (--deathTime_ <= 0) {
 		isDead_ = true;

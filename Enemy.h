@@ -1,81 +1,90 @@
 #pragma once
 #include "EnemyBullet.h"
-#include "ImGuiManager.h"
-#include "Model.h"
 #include "TextureManager.h"
+#include "Model.h"
+#include "Player.h"
+#include "TimedCall.h"
+#include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "assert.h"
 #include <list>
+
+enum class Phase {
+	Approach, // 接近する
+	Leave,    // 離脱する
+};
+
 class Player;
 
-class Enemy {
-public:
-	/// <summary>
-	/// 初期化
-	/// </summary>
-	/// <param name= "model">モデル</param>
-	/// <param name= "textureHandle">初期座標</param>
-	void Initialize(Model* model, const Vector3& position, const Vector3& velocity);
+class Enemy;
 
-	/// <summary>
-	/// 更新
-	/// </summary>
+class GameScene;
+
+class EnemyState {
+
+protected:
+	Enemy* enemy_ = nullptr;
+
+public:
+	virtual void SetEnemy(Enemy* enemy) { enemy_ = enemy; }
+	virtual void Update(){};
+};
+
+class EnemyStateApproah : public EnemyState {
+
+public:
+	void Update();
+};
+
+class EnemyStateLeave : public EnemyState {
+
+public:
+	void Update();
+};
+
+class Enemy {
+
+public:
+	~Enemy();
+
+	void Initialize(Model* model, const Vector3& position, GameScene* gameScene);
+
 	void Update();
 
-	/// <summary>
-	/// 描画
-	/// </summary>
-	/// <param name= "viewProjection">ビュープロジェクション）</param>
-	void Draw(ViewProjection view);
+	void Draw(const ViewProjection& viewProjection);
 
-	///
-	///
-	///
+	void ChangeState(EnemyState* newEnemyState);
+
+	WorldTransform GetWT() { return worldTransform_; }
+
+	void SetPosition(Vector3 speed);
+
+	void Attack();
+
 	void Fire();
 
-	///
-	///
-	///
-	void Approach();
-
-	///
-	///
-	/// 
 	void SetPlayer(Player* player) { player_ = player; }
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <returns></returns>
-	void OnCollision();
 
 	Vector3 GetWorldPosition();
 
-	const std::list<EnemyBullet*>& GetBullets() const { return bullets_; }
-	/// <summary>
-	/// 行動フェーズ
-	/// </summary>
-	enum class Phase {
-		Approach, // 接近する
-		Attack,   // 攻撃する
-		Leave,    // 離脱する
-	};
-	~Enemy();
+	static const int kShotInterval = 60;
 
-public:
-	WorldTransform worldTransform_;
-	Model* model_ = nullptr;
-	uint32_t textureHandle_;
-	float enemyInputFloat[3]{0, 0, 0};
-	Phase phase_ = Phase ::Approach;
-	Vector3 velocity_;
-	EnemyBullet* bullet_ = nullptr;
-	std::list<EnemyBullet*> bullets_;
-	static const int kFreInterval = 60;
-	Player* player_ = nullptr;
-	//Vector3 Normalise;
-	
+	bool IsDead() const { return isDead_; }
+
+	void OnCollision();
+	const std::list<EnemyBullet*>& GetBullets() const { return bullets_; }
+
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 
 private:
-	int32_t startTimer = 0;
+	WorldTransform worldTransform_;
+	Model* model_;
+	uint32_t texturehandle_;
+	Phase phase_ = Phase::Approach;
+	Player* player_ = nullptr;
+	EnemyState* state;
+	GameScene* gameScene_ = nullptr;
+	std::list<EnemyBullet*> bullets_;
+	std::list<TimedCall*> timedCall_;
+	bool isDead_ = false;
+	int timer = 0;
 };

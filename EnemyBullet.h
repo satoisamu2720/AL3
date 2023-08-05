@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Model.h"
 #include "WorldTransform.h"
+
 #include "assert.h"
 class EnemyBullet {
 	
@@ -14,7 +15,7 @@ class EnemyBullet {
 	 /// <summary>
 	/// 更新
 	/// </summary>
-	void Updarte();
+	void Update();
 	/// <summary>
 	/// 描画
 	/// </summary>

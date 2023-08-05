@@ -4,44 +4,92 @@
 #include "VectraCalculation.h"
 
 Enemy::~Enemy() {
+	delete state;
 	for (EnemyBullet* bullet : bullets_) {
-
 		delete bullet;
+	}
+
+	for (TimedCall* timedCall : timedCall_) {
+		delete timedCall;
 	}
 	
 }
-void Enemy::Initialize(Model* model, const Vector3& position, const Vector3& velocity) {
+void Enemy::Initialize(Model* model, const Vector3& position, GameScene* gameScene) {
 	assert(model);
 	model_ = model;
-	textureHandle_ = TextureManager::Load("Enemy.png");
+	texturehandle_ = TextureManager::Load("Enemy.png");
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
-	velocity_ = velocity;
+
+	state = new EnemyStateApproah();
+	state->SetEnemy(this);
+	SetGameScene(gameScene);
 	
 };
 
 void Enemy::Fire() {
-	// 弾を生成し，初期化
 	
+	
+	Attack();
 
-	const float kBulletSpeed = 0.6f;
-	Vector3 playerPos = player_->GetWorldPosition();
-	Vector3 enemyPos = this->GetWorldPosition();
-    Vector3 velcity = Subtract(playerPos, enemyPos);
-	velcity = Normalize(velcity);
-	velcity.x *= kBulletSpeed;
-	velcity.y *= kBulletSpeed;
-	velcity.z *= kBulletSpeed;
+	timedCall_.push_back(new TimedCall(std::bind(&Enemy::Fire, this), 60));
+	
+}
+void Enemy::Attack() {
+	assert(player_);
+	timer--;
 
-	EnemyBullet* newBullet = new EnemyBullet();
-	newBullet->Initialize(model_, worldTransform_.translation_, velcity);
+	if (timer < 0) {
+		const float kBulletSpeed = 0.6f;
+		Vector3 playerPos = player_->GetWorldPosition();
+		Vector3 enemyPos = this->GetWorldPosition();
+		Vector3 velcity = Subtract(playerPos, enemyPos);
+		velcity = Normalize(velcity);
+		velcity.x *= kBulletSpeed;
+		velcity.y *= kBulletSpeed;
+		velcity.z *= kBulletSpeed;
 
-	// 弾を登録する
-	bullets_.push_back(newBullet);
+		EnemyBullet* newBullet = new EnemyBullet();
+		newBullet->Initialize(model_, worldTransform_.translation_, velcity);
+
+		// 弾を登録する
+		bullets_.push_back(newBullet);
+
+		timer = kShotInterval;
+	}
+}
+void Enemy::ChangeState(EnemyState* newEnemyState) {
+	delete state;
+
+	state = newEnemyState;
+	state->SetEnemy(this);
+}
+
+void Enemy::SetPosition(Vector3 velcity) {
+	worldTransform_.translation_ = Add(worldTransform_.translation_, velcity);
+}
+
+void EnemyStateApproah::Update() {
+	Vector3 appSpeed(0, 0, -0.2f);
+	enemy_->SetPosition(appSpeed);
+
+	enemy_->Fire();
+
+	if (enemy_->GetWT().translation_.z < 0.0f) {
+		enemy_->ChangeState(new EnemyStateLeave);
+	}
+}
+
+void EnemyStateLeave::Update() {
+	Vector3 leaveSpeed(-0.2f, 0.2f, 0.2f);
+	enemy_->SetPosition(leaveSpeed);
+
+	enemy_->Fire();
 }
 
 void Enemy::Update() {
 
+	// デスフラグの立った球を削除
 	bullets_.remove_if([](EnemyBullet* bullet) {
 		if (bullet->IsDead()) {
 			delete bullet;
@@ -49,31 +97,36 @@ void Enemy::Update() {
 		}
 		return false;
 	});
+
+	state->Update();
+
+	// Attack();
+
+	timedCall_.remove_if([](TimedCall* timedCall) {
+		if (timedCall->IsFinished()) {
+			delete timedCall;
+			return false;
+		}
+		return true;
+	});
+
 	worldTransform_.UpdateMatrix();
-	const float kCharacterSpeed = 0.0f;
-	// 移動（ベクトルを加算）
-	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
-	worldTransform_.translation_.z -= kCharacterSpeed;
-	startTimer--;
-	if (startTimer <= 0.01) {
 
-		Fire();
-		Approach();
-
-		startTimer = kFreInterval;
+	for (TimedCall* timedCalls : timedCall_) {
+		timedCalls->Update();
 	}
 	for (EnemyBullet* bullet : bullets_) {
-		bullet->Updarte();
+		bullet->Update();
 	}
-};
-void Enemy::Approach() { startTimer = 0; }
-
-void Enemy::Draw(const ViewProjection viewProjection) {
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+}
+void Enemy::Draw(const ViewProjection& viewProjection) {
+	model_->Draw(worldTransform_, viewProjection, texturehandle_);
 	for (EnemyBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
 	}
 };
+
+
 
 void Enemy::OnCollision() {}
 
