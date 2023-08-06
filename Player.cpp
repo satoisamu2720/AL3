@@ -21,20 +21,25 @@ void Player::Atack() {
 		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
 			isAttack = true;
 		} else {
-			isAttack = false;
+			//isAttack = false;
 		}
 
 	} else if (isControl) {
 		if (input_->PushKey(DIK_SPACE)|| input_->IsPressMouse(0)) {
 			isAttack = true;
 		} else {
-			 isAttack = false;
+			// isAttack = false;
 		}
 	}
 
 	if (isAttack) {
 
-		if (input_->PushKey(DIK_SPACE) || input_->IsPressMouse(0)) {
+		XINPUT_STATE joyState;
+		if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
+			 return;
+		}
+		if (input_->PushKey(DIK_SPACE) || input_->IsPressMouse(0) ||
+		    joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
 			if (StopTimer == 0) {
 				// 弾の速度
 				const float kBulletSpeed = 1.0f;
