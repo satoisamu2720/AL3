@@ -35,7 +35,7 @@ void GameScene::Initialize() {
 	viewProjection_.Initialize();
 
 	player_ = new Player();
-	Vector3 playerPosition(0, -1, 5);
+	Vector3 playerPosition(0, -1, 10);
 	// 自キャラの初期化
 	player_->Initialize(model_, textureHandle_, playerPosition);
 

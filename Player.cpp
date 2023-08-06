@@ -156,7 +156,7 @@ void Player::Update(ViewProjection view) {
 	ImGui::Text("Toggle Camera Flag :LEFT SHIFT");
 	ImGui::Text("Change Mouse : F");
 	ImGui::Text("Change Controller : C");
-	ImGui::SliderFloat3("player", inputFloat3, -30.0f, 30.0f);
+	ImGui::SliderFloat3("player", inputFloat3, -5.0f, 5.0f);
 	ImGui::End();
 	worldTransform_.translation_.x = inputFloat3[0];
 	worldTransform_.translation_.y = inputFloat3[1];
@@ -258,8 +258,8 @@ void Player::MouseUpdate(ViewProjection& view) {
 		Vector2 spritePosition = sprite2DReticle_->GetPosition();
 
 		if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-			spritePosition.x += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * 8.0f;
-			spritePosition.y -= (float)joyState.Gamepad.sThumbRY / SHRT_MAX * 8.0f;
+			spritePosition.x += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * 100.0f;
+			spritePosition.y -= (float)joyState.Gamepad.sThumbRY / SHRT_MAX * 100.0f;
 
 			sprite2DReticle_->SetPosition(spritePosition);
 		}
