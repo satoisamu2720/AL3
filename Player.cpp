@@ -21,14 +21,14 @@ void Player::Atack() {
 		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
 			isAttack = true;
 		} else {
-			// isAttack = false;
+			isAttack = false;
 		}
 
 	} else if (isControl) {
 		if (input_->PushKey(DIK_SPACE)|| input_->IsPressMouse(0)) {
 			isAttack = true;
 		} else {
-			// isAttack = false;
+			 isAttack = false;
 		}
 	}
 
@@ -79,14 +79,13 @@ void Player::Initialize(Model* model, uint32_t textureHandle ,Vector3 position) 
 	worldTransform3DReticle_.Initialize();
 	uint32_t textureReticle = TextureManager::Load("cursor.png");
 
-	sprite2DReticle_ = Sprite::Create(
-	    textureReticle, {WinApp::kWindowWidth / 2, WinApp::kWindowHeight / 2}, {1, 1, 1, 1},
-	    {0.5f, 0.5f});
+	sprite2DReticle_ = Sprite::Create( textureReticle, {WinApp::kWindowWidth / 2, WinApp::kWindowHeight / 2}, {1, 1, 1, 1}, {0.5f, 0.5f});
 };
 
 void Player::Update(ViewProjection view) {
 	
 	XINPUT_STATE joyState;
+
 	// falseになった弾を消す
 	bullets_.remove_if([](PlayerBullet* bullet) {
 		if (bullet->IsDead()) {
@@ -123,7 +122,12 @@ void Player::Update(ViewProjection view) {
 	} else if (input_->PushKey(DIK_S)) {
 		move.y -= kCharacterSpeed;
 	}
-
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		move.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX * kCharacterSpeed;
+		
+		move.y += (float)joyState.Gamepad.sThumbLY / SHRT_MAX * kCharacterSpeed;
+		
+	}
 	// ベクターの加算
 	worldTransform_.translation_ = Add(worldTransform_.translation_, move);
 	// アフィン変換行列の作成
@@ -133,15 +137,11 @@ void Player::Update(ViewProjection view) {
 	worldTransform_.UpdateMatrix();
 
 	float inputFloat3[3] = {
-	    worldTransform_.translation_.x, worldTransform_.translation_.y,
+	    worldTransform_.translation_.x, 
+		worldTransform_.translation_.y,
 	    worldTransform_.translation_.z};
 
-	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-		move.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX * kCharacterSpeed;
-		inputFloat3[0] = worldTransform_.translation_.x;
-		move.y += (float)joyState.Gamepad.sThumbLY / SHRT_MAX * kCharacterSpeed;
-		inputFloat3[1] = worldTransform_.translation_.y;
-	}
+	
 	// デバッグ
 	
 	
@@ -260,16 +260,12 @@ void Player::MouseUpdate(ViewProjection& view) {
 		}
 	}
 
-	Matrix4x4 viewPortMat =MakeViewPortMatrix(
-	    0, 0, float(WinApp::kWindowWidth), float(WinApp::kWindowHeight), 0.0f, 1.0f);
-	Matrix4x4 matVPV =
-	    MMMultiply(view.matView, MMMultiply(view.matProjection, viewPortMat));
+	Matrix4x4 viewPortMat =MakeViewPortMatrix( 0, 0, float(WinApp::kWindowWidth), float(WinApp::kWindowHeight), 0.0f, 1.0f);
+	Matrix4x4 matVPV = MMMultiply(view.matView, MMMultiply(view.matProjection, viewPortMat));
 	Matrix4x4 matInverseVPV =Inverse(matVPV);
 
-	Vector3 posNear =
-	    Vector3(sprite2DReticle_->GetPosition().x, sprite2DReticle_->GetPosition().y, 0);
-	Vector3 posFar =
-	    Vector3(sprite2DReticle_->GetPosition().x, sprite2DReticle_->GetPosition().y, 1);
+	Vector3 posNear =Vector3(sprite2DReticle_->GetPosition().x, sprite2DReticle_->GetPosition().y, 0);
+	Vector3 posFar =Vector3(sprite2DReticle_->GetPosition().x, sprite2DReticle_->GetPosition().y, 1);
 
 	posNear = TransformCoord(posNear, matInverseVPV);
 	posFar = TransformCoord(posFar, matInverseVPV);
@@ -281,12 +277,9 @@ void Player::MouseUpdate(ViewProjection& view) {
 	mouseDirection = Normalize(mouseDirection);
 
 	const float kDistanceTestObject = 100.0f;
-	worldTransform3DReticle_.translation_.x =
-	    FVMultiply(kDistanceTestObject, mouseDirection).x + posNear.x;
-	worldTransform3DReticle_.translation_.y =
-	    FVMultiply(kDistanceTestObject, mouseDirection).y + posNear.y;
-	worldTransform3DReticle_.translation_.z =
-	    FVMultiply(kDistanceTestObject, mouseDirection).z + posNear.z;
+	worldTransform3DReticle_.translation_.x = FVMultiply(kDistanceTestObject, mouseDirection).x + posNear.x;
+	worldTransform3DReticle_.translation_.y = FVMultiply(kDistanceTestObject, mouseDirection).y + posNear.y;
+	worldTransform3DReticle_.translation_.z = FVMultiply(kDistanceTestObject, mouseDirection).z + posNear.z;
 
 	worldTransform3DReticle_.UpdateMatrix();
 
