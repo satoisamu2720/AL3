@@ -56,7 +56,7 @@ public:
 
 	WorldTransform GetWT() { return worldTransform_; }
 
-	void SetPosition(Vector3 speed);
+	void SetPosition(Vector3 velcity);
 
 	void Attack();
 

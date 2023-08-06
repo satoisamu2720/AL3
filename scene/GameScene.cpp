@@ -60,7 +60,7 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-	player_->Update(); 
+	player_->Update(viewProjection_); 
 	UpDateEnemyPopCommands();
 	CheckAllCollisions();
 	skydome_->Update();
@@ -168,7 +168,7 @@ void GameScene::Update() {
 
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
-
+	player_->DrawUI();
 	/// </summary>
 
 	// スプライト描画後処理

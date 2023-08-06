@@ -14,8 +14,67 @@ inline Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
 inline Vector3 Multiply(float scalar, const Vector3& v) {
 	return {v.x * scalar, v.y * scalar, v.z * scalar};
 }
+static Vector3 FVMultiply(const float& v1, const Vector3& v2) {
+	Vector3 result{};
+	result.x = v1 * v2.x;
+	result.y = v1 * v2.y;
+	result.z = v1 * v2.z;
+	return result;
+}
+static Matrix4x4 MMMultiply(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 result{};
 
-inline float Length(const Vector3& v) { return sqrtf((v.x * v.x) + (v.y * v.y) + (v.z * v.z)); }
+	for (int row = 0; row < 4; row++) {
+		for (int column = 0; column < 4; column++) {
+			result.m[row][column] = m1.m[row][0] * m2.m[0][column] +
+			                        m1.m[row][1] * m2.m[1][column] +
+			                        m1.m[row][2] * m2.m[2][column] + m1.m[row][3] * m2.m[3][column];
+		}
+	}
+	return result;
+}
+static Vector3 TransformCoord(Vector3& vector, Matrix4x4& matrix) {
+		Vector3 result{};
+		result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] +
+		           vector.z * matrix.m[2][0] + 1.0f * matrix.m[3][0];
+		result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] +
+		           vector.z * matrix.m[2][1] + 1.0f * matrix.m[3][1];
+		result.z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] +
+		           vector.z * matrix.m[2][2] + 1.0f * matrix.m[3][2];
+
+		float w = vector.x * matrix.m[0][3] + vector.y * matrix.m[1][3] +
+		          vector.z * matrix.m[2][3] + 1.0f * matrix.m[3][3];
+		assert(w != 0.0f);
+		result.x /= w;
+		result.y /= w;
+		result.z /= w;
+
+		return result;
+	}
+static Matrix4x4 MakeViewPortMatrix(
+    float left, float top, float width, float height, float minDepth, float maxDepth) {
+	    Matrix4x4 result{};
+	    for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			result.m[i][j] = 0;
+		}
+	    }
+	    result.m[0][0] = width / 2;
+	    result.m[1][1] = -(height / 2);
+	    result.m[2][2] = maxDepth - minDepth;
+	    result.m[3][0] = left + (width / 2);
+	    result.m[3][1] = top + (height / 2);
+	    result.m[3][2] = minDepth;
+	    result.m[3][3] = 1;
+
+	    return result;
+}
+
+
+
+inline float Length(const Vector3& v) {
+	return sqrtf((v.x * v.x) + (v.y * v.y) + (v.z * v.z)); 
+}
 
 inline Vector3 Normalize(const Vector3& v) {
 	float len = Length(v);
@@ -49,13 +108,6 @@ inline Vector3 Slerp(float t, const Vector3& s, const Vector3& e) {
 	return Add(Multiply(t1, s), Multiply(t2, e));
 }
 
-// inline Vector3 Add(const Vector3& v1, const Vector3& v2) {
-//	Vector3 result;
-//	result.x = v1.x + v2.x;
-//	result.y = v1.y + v2.y;
-//	result.z = v1.z + v2.z;
-//	return result;
-// }
 
 inline Matrix4x4 Inverse(const Matrix4x4& m) {
 	Matrix4x4 result;

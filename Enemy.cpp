@@ -42,12 +42,13 @@ void Enemy::Attack() {
 	if (timer < 0) {
 		const float kBulletSpeed = 0.6f;
 		Vector3 playerPos = player_->GetWorldPosition();
-		Vector3 enemyPos = this->GetWorldPosition();
+		Vector3 enemyPos = GetWorldPosition();
 		Vector3 velcity = Subtract(playerPos, enemyPos);
 		velcity = Normalize(velcity);
 		velcity.x *= kBulletSpeed;
 		velcity.y *= kBulletSpeed;
 		velcity.z *= kBulletSpeed;
+		velcity = TransformNormal(velcity, worldTransform_.matWorld_);
 
 		EnemyBullet* newBullet = new EnemyBullet();
 		newBullet->Initialize(model_, worldTransform_.translation_, velcity);

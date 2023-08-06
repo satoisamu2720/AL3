@@ -7,7 +7,7 @@
 #include "Input.h"
 #include "PlayerBullet.h"
 #include <list>
-
+#include "Sprite.h"
 
 class Player {
 public:
@@ -22,7 +22,7 @@ public:
 	///
 	///
 	///
-	void Update();
+	void Update(ViewProjection view);
 
 	///
 	///
@@ -38,6 +38,7 @@ public:
 	/// <returns></returns>
 	void OnCollision();
 	
+	void DrawUI();
 	Vector3  GetWorldPosition();
 
 	const std::list<PlayerBullet*>& GetBullets() const { return bullets_; }
@@ -54,8 +55,8 @@ public:
 	PlayerBullet* bullet_ = nullptr;
 	float inputFloat[3]{0, 0, 0};
 	std::list<PlayerBullet*> bullets_;
-
-
+	WorldTransform worldTransform3DReticle_;
+	Sprite* sprite2DReticle_ = nullptr;
 	int StopTimer = 0;
 	
 	
