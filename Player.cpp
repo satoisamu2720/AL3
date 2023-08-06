@@ -12,34 +12,11 @@ Player::~Player() {
 
 
 void Player::Atack() {
-	if (!isControl) {
-		XINPUT_STATE joyState;
-		if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
-			return;
-		}
 
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
-			isAttack = true;
-		} else {
-			//isAttack = false;
-		}
+	if (isControl) {
 
-	} else if (isControl) {
-		if (input_->PushKey(DIK_SPACE)|| input_->IsPressMouse(0)) {
-			isAttack = true;
-		} else {
-			// isAttack = false;
-		}
-	}
-
-	if (isAttack) {
-
-		XINPUT_STATE joyState;
-		if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
-			 return;
-		}
-		if (input_->PushKey(DIK_SPACE) || input_->IsPressMouse(0) ||
-		    joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+		
+		if (input_->PushKey(DIK_SPACE) || input_->IsPressMouse(0)) {
 			if (StopTimer == 0) {
 				// 弾の速度
 				const float kBulletSpeed = 1.0f;
@@ -64,6 +41,38 @@ void Player::Atack() {
 			}
 		} else {
 			StopTimer = 0;
+		  }
+	} else if (!isControl) {
+		XINPUT_STATE joyState;
+		if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
+			return;
+		}
+		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+			if (StopTimer == 0) {
+				// 弾の速度
+				const float kBulletSpeed = 1.0f;
+
+				Vector3 velocity;
+				Vector3 Reticle3DPos;
+				Reticle3DPos.x = worldTransform3DReticle_.matWorld_.m[3][0];
+				Reticle3DPos.y = worldTransform3DReticle_.matWorld_.m[3][1];
+				Reticle3DPos.z = worldTransform3DReticle_.matWorld_.m[3][2];
+
+				velocity.x = Reticle3DPos.x - worldTransform_.matWorld_.m[3][0];
+				velocity.y = Reticle3DPos.y - worldTransform_.matWorld_.m[3][1];
+				velocity.z = Reticle3DPos.z - worldTransform_.matWorld_.m[3][2];
+				velocity = FVMultiply(kBulletSpeed, Normalize(velocity));
+
+				PlayerBullet* newBullet = new PlayerBullet();
+				newBullet->Initialize(model_, GetWorldPosition(), velocity);
+				// 弾を登録
+				// bullet_ = newBullet;
+				bullets_.push_back(newBullet);
+				StopTimer++;
+			}
+		} else {
+			StopTimer = 0;
+		
 		}
 	}
 };
@@ -201,7 +210,7 @@ void Player::Update(ViewProjection view) {
 	    MakeViewPortMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
 	Matrix4x4 matViewProjectionViewPort = MMMultiply(view.matProjection, matViewPort);
 	positionReticle = TransformCoord(positionReticle, matViewProjectionViewPort);
-	sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
+	//sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
 
 	MouseUpdate(view);
 	
@@ -242,7 +251,7 @@ void Player::MouseUpdate(ViewProjection& view) {
 	} else if (input_->TriggerKey(DIK_C)) {
 		isControl = false;
 	}
-
+	                                                                                           
 	if (isControl) {
 		POINT mousePosition;
 
@@ -258,12 +267,13 @@ void Player::MouseUpdate(ViewProjection& view) {
 		Vector2 spritePosition = sprite2DReticle_->GetPosition();
 
 		if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-			spritePosition.x += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * 500.0f;
-			spritePosition.y -= (float)joyState.Gamepad.sThumbRY / SHRT_MAX *500.0f;
+			spritePosition.x += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * 8.0f;
+			spritePosition.y -= (float)joyState.Gamepad.sThumbRY / SHRT_MAX * 8.0f;
 
 			sprite2DReticle_->SetPosition(spritePosition);
-		}
+		} 
 	}
+	
 
 	Matrix4x4 viewPortMat =MakeViewPortMatrix( 0, 0, float(WinApp::kWindowWidth), float(WinApp::kWindowHeight), 0.0f, 1.0f);
 	Matrix4x4 matVPV = MMMultiply(view.matView, MMMultiply(view.matProjection, viewPortMat));
@@ -282,11 +292,11 @@ void Player::MouseUpdate(ViewProjection& view) {
 	mouseDirection = Normalize(mouseDirection);
 
 	const float kDistanceTestObject = 100.0f;
-	worldTransform3DReticle_.translation_.x = FVMultiply(kDistanceTestObject, mouseDirection).x + posNear.x;
-	worldTransform3DReticle_.translation_.y = FVMultiply(kDistanceTestObject, mouseDirection).y + posNear.y;
-	worldTransform3DReticle_.translation_.z = FVMultiply(kDistanceTestObject, mouseDirection).z + posNear.z;
+	worldTransform3DReticle_.translation_ =
+	    Add(posNear, FVMultiply(kDistanceTestObject, mouseDirection));
 
 	worldTransform3DReticle_.UpdateMatrix();
+	
 
 	ImGui::Begin("Player");
 	ImGui::Text(
