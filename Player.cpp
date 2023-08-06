@@ -258,8 +258,8 @@ void Player::MouseUpdate(ViewProjection& view) {
 		Vector2 spritePosition = sprite2DReticle_->GetPosition();
 
 		if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-			spritePosition.x += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * 100.0f;
-			spritePosition.y -= (float)joyState.Gamepad.sThumbRY / SHRT_MAX * 100.0f;
+			spritePosition.x += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * 500.0f;
+			spritePosition.y -= (float)joyState.Gamepad.sThumbRY / SHRT_MAX *500.0f;
 
 			sprite2DReticle_->SetPosition(spritePosition);
 		}
