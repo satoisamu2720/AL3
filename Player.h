@@ -42,7 +42,7 @@ public:
 	Vector3  GetWorldPosition();
 
 	const std::list<PlayerBullet*>& GetBullets() const { return bullets_; }
-
+	void MouseUpdate(ViewProjection& view);
 	void SetParent(const WorldTransform* parent) { worldTransform_.parent_ = parent; }
 	/// <summary>
 /// 
@@ -53,11 +53,12 @@ public:
 	uint32_t textureHandle_ = 0u;
 	Input* input_ = nullptr;
 	PlayerBullet* bullet_ = nullptr;
-	float inputFloat[3]{0, 0, 0};
+	
 	std::list<PlayerBullet*> bullets_;
 	WorldTransform worldTransform3DReticle_;
 	Sprite* sprite2DReticle_ = nullptr;
 	int StopTimer = 0;
-	
+	bool isControl = false;
+	bool isAttack = false;
 	
 };

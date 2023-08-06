@@ -87,6 +87,7 @@ private: // メンバ変数
 
 	DebugCamera* debugCamera_ = nullptr;
 	Player* player_ = nullptr;
+	Enemy* enemy_ = nullptr;
 	Skydome* skydome_ = nullptr;
 	Model* modelSkydome_ = nullptr;
 	
@@ -95,7 +96,7 @@ private: // メンバ変数
 	bool isDebugcameraActive_ = false;
 	RailCamera* railCamera_;
 
-	std::list<EnemyBullet*> enemyBullets_;
+	std::list<EnemyBullet*> bullets_;
 	std::list<Enemy*> enemys_;
 	
 	std::stringstream enemyPopCommands;

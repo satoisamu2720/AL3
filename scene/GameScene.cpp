@@ -11,7 +11,7 @@ GameScene::~GameScene() {
 	for (Enemy* enemy : enemys_) {
 		delete enemy;
 	}
-	for (EnemyBullet* bullet : enemyBullets_) {
+	for (EnemyBullet* bullet : bullets_) {
 		delete bullet;
 	}
 	delete skydome_;
@@ -80,7 +80,7 @@ void GameScene::Update() {
 		enemy->Update();
 	}
 
-	enemyBullets_.remove_if([](EnemyBullet* bullet) {
+	bullets_.remove_if([](EnemyBullet* bullet) {
 		if (bullet->IsDead()) {
 			delete bullet;
 			return true;
@@ -88,7 +88,7 @@ void GameScene::Update() {
 		return false;
 	});
 
-	for (EnemyBullet* bullet : enemyBullets_) {
+	for (EnemyBullet* bullet : bullets_) {
 		bullet->Update();
 	}
 
@@ -155,7 +155,7 @@ void GameScene::Update() {
 		enemy->Draw(viewProjection_);
 	}
 
-	for (EnemyBullet* bullet : enemyBullets_) {
+	for (EnemyBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection_);
 	}
 	skydome_->Draw(viewProjection_);
@@ -185,11 +185,11 @@ void GameScene::Update() {
 	float enemyRadius = 1.0f;
 
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
-
+	
 	
 #pragma region
 	posA = player_->GetWorldPosition();
-	for (EnemyBullet* bullet : enemyBullets_) {
+	for (EnemyBullet* bullet : bullets_) {
 		posB = bullet->GetWorldPosition();
 		float collide = {
 		    (posB.x - posA.x) * (posB.x - posA.x)+ (posB.y - posA.y) * (posB.y - posA.y)+
@@ -203,17 +203,17 @@ void GameScene::Update() {
 #pragma region
 	
 	
-	for (PlayerBullet* playerBullet : playerBullets) {
-		posB = playerBullet->GetWorldPosition();
-		for (EnemyBullet* Bullet : enemyBullets_) {
-			posA = Bullet->GetWorldPosition();
+	for (PlayerBullet* Pbullet : playerBullets) {
+		posB = Pbullet->GetWorldPosition();
+		for (EnemyBullet* Ebullet : bullets_) {
+			posA = Ebullet->GetWorldPosition();
 		float collide = {
 		    (posB.x - posA.x) * (posB.x - posA.x) + (posB.y - posA.y) * (posB.y - posA.y) +
 		    (posB.z - posA.z) * (posB.z - posA.z)};
 			if (collide <=
 			    (enemyRadius + playerBulletRadius) * (enemyRadius + playerBulletRadius)) {
-				Bullet->OnCollision();
-				playerBullet->OnCollision();
+			Pbullet->OnCollision();
+				Ebullet->OnCollision();
 			}
 		}
 	}
@@ -239,7 +239,7 @@ void GameScene::Update() {
  }
     void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
 	// リストに登録する
-	enemyBullets_.push_back(enemyBullet);
+	bullets_.push_back(enemyBullet);
     }
 
     void GameScene::AddEnemy(Enemy* enemy) { enemys_.push_back(enemy); }
